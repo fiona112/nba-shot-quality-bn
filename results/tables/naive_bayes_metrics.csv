@@ -1,0 +1,2 @@
+model,log_loss,brier_score,accuracy
+Naive Bayes,0.67566766375244,0.24043949102155904,0.6056951294697904
