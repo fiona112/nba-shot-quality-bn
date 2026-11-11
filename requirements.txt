@@ -1,0 +1,9 @@
+numpy>=1.26,<3
+pandas>=2.2,<3
+scikit-learn>=1.5,<2
+matplotlib>=3.8,<4
+seaborn>=0.13,<1
+pgmpy>=1.0,<2
+networkx>=3.2,<4
+jupyterlab>=4,<5
+pytest>=8,<10
