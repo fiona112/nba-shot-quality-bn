@@ -1,0 +1,2 @@
+model,log_loss,brier_score,accuracy
+Hand-Designed BN,0.6575145650348914,0.23287637106317052,0.6152512330456227
