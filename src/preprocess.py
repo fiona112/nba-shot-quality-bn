@@ -1,4 +1,5 @@
 
+import json
 from pathlib import Path
 
 import numpy as np
@@ -10,11 +11,52 @@ RAW_PATH = Path("data/raw/shot_logs.csv")
 OUTPUT_DIR = Path("data/processed")
 
 FEATURES = ["T", "D", "C", "S", "B", "H"]
+SHOT_DISTANCE_BINS = [0, 5, 10, 15, 20, 25, 30, np.inf]
+SHOT_DISTANCE_LABELS = ["<5", "5-10", "10-15", "15-20", "20-25", "25-30", "30+"]
 REQUIRED = [
-    "GAME_ID", "SHOT_RESULT", "PTS_TYPE",
+    "GAME_ID", "GAME_CLOCK", "SHOT_RESULT", "PTS_TYPE",
     "SHOT_DIST", "CLOSE_DEF_DIST",
     "SHOT_CLOCK", "DRIBBLES", "TOUCH_TIME"
 ]
+
+
+def parse_game_clock(values):
+    """Parse M:SS or M:SS.s; malformed clocks remain unknown."""
+    parts = values.astype("string").str.strip().str.extract(
+        r"^(\d{1,2}):(\d{1,2}(?:\.\d+)?)$"
+    )
+    minutes = pd.to_numeric(parts[0], errors="coerce")
+    seconds = pd.to_numeric(parts[1], errors="coerce")
+    total = minutes * 60 + seconds
+    return total.where(seconds.ge(0) & seconds.lt(60) & total.le(720))
+
+
+def prepare_shot_clock(df):
+    """Preserve recorded clocks and create a documented modeling proxy."""
+    df = df.copy()
+    raw = df["SHOT_CLOCK"]
+    clock = pd.to_numeric(raw, errors="coerce")
+    df["GAME_CLOCK_SECONDS"] = parse_game_clock(df["GAME_CLOCK"])
+    df["SHOT_CLOCK_WAS_MISSING"] = raw.isna()
+    df["SHOT_CLOCK_IS_24"] = clock.eq(24)
+
+    recorded = clock.between(0, 24)
+    # This window permits a clock-off explanation but cannot prove it.
+    period_proxy = raw.isna() & df["GAME_CLOCK_SECONDS"].between(0, 24)
+    df["SHOT_CLOCK_EFFECTIVE"] = clock.where(recorded)
+    df.loc[period_proxy, "SHOT_CLOCK_EFFECTIVE"] = df.loc[
+        period_proxy, "GAME_CLOCK_SECONDS"
+    ]
+    df["SHOT_CLOCK_SOURCE"] = pd.Series("invalid_recorded", index=df.index)
+    df.loc[raw.isna(), "SHOT_CLOCK_SOURCE"] = "missing_unexplained"
+    df.loc[recorded, "SHOT_CLOCK_SOURCE"] = "recorded"
+    df.loc[period_proxy, "SHOT_CLOCK_SOURCE"] = "period_clock_proxy"
+    df.loc[df["SHOT_CLOCK_IS_24"], "SHOT_CLOCK_SOURCE"] = "recorded_24_unverified"
+    df["EXCLUDE_SHOT_CLOCK"] = df["SHOT_CLOCK_EFFECTIVE"].isna()
+    df["SHOT_CLOCK_EXCLUSION_REASON"] = df["SHOT_CLOCK_SOURCE"].where(
+        df["EXCLUDE_SHOT_CLOCK"], pd.NA
+    )
+    return df
 
 
 def audit_data(df):
@@ -47,6 +89,11 @@ def audit_data(df):
     )
 
     if "GAME_CLOCK" in df.columns:
+        game_seconds = parse_game_clock(df["GAME_CLOCK"])
+        print("Missing clocks with game clock <=24:",
+              (clock.isna() & game_seconds.between(0, 24)).sum())
+        print("Missing clocks outside that window or with invalid game clock:",
+              (clock.isna() & ~game_seconds.between(0, 24)).sum())
         print("\nGAME_CLOCK values for missing shot clocks:")
         print(
             df.loc[clock.isna(), "GAME_CLOCK"]
@@ -70,7 +117,7 @@ def audit_data(df):
 
 
 def preprocess(df):
-    df = df.copy()
+    df = prepare_shot_clock(df)
 
     # Standardize names and numeric inputs
     numeric_cols = [
@@ -89,8 +136,7 @@ def preprocess(df):
         .map({"made": 1, "missed": 0})
     )
 
-    # Keep rows with valid targets and required features.
-    # Missing shot clock is allowed.
+    # Keep valid targets/features and recorded or end-of-period proxy clocks.
     required_nonmissing = [
         "GAME_ID", "M", "PTS_TYPE", "SHOT_DIST",
         "CLOSE_DEF_DIST", "DRIBBLES", "TOUCH_TIME"
@@ -103,24 +149,22 @@ def preprocess(df):
     valid &= df["DRIBBLES"].ge(0)
     valid &= df["TOUCH_TIME"].ge(0)
 
-    # Leave shot clocks at exactly 24.0 untouched
-    # until the data audit is reviewed.
-    valid &= df["SHOT_CLOCK"].isna() | (
-        df["SHOT_CLOCK"].between(0, 24)
-    )
+    # Unexplained missing clocks and invalid recorded clocks have no proxy.
+    valid &= ~df["EXCLUDE_SHOT_CLOCK"]
 
     print("\nRows removed:", (~valid).sum())
     df = df.loc[valid].copy()
+    print("\nShot-clock sources retained:")
+    print(df["SHOT_CLOCK_SOURCE"].value_counts())
 
     # Shot type
     df["T"] = df["PTS_TYPE"].astype(int).astype(str)
 
-    # Shot distance (feet)
+    # Five-foot distance ranges, with 30+ feet kept separate for deep attempts.
     df["D"] = pd.cut(
         df["SHOT_DIST"],
-        bins=[-np.inf, 4, 10, 16, 22, 26, np.inf],
-        labels=["<4", "4-10", "10-16", "16-22",
-                "22-26", "26+"],
+        bins=SHOT_DISTANCE_BINS,
+        labels=SHOT_DISTANCE_LABELS,
         right=False
     )
 
@@ -132,9 +176,9 @@ def preprocess(df):
         right=False
     )
 
-    # Shot clock (seconds)
+    # Use game-clock time as a flagged proxy only for missing end-period clocks.
     df["S"] = pd.cut(
-        df["SHOT_CLOCK"],
+        df["SHOT_CLOCK_EFFECTIVE"],
         bins=[-np.inf, 4, 7, 15, 18, 22, np.inf],
         labels=["0-4", "4-7", "7-15",
                 "15-18", "18-22", "22+"],
@@ -197,10 +241,33 @@ def split_data(df):
     return train, test
 
 
+def split_validation(train):
+    """Reserve 20% of training games for model selection, keeping test untouched."""
+    splitter = GroupShuffleSplit(
+        n_splits=1,
+        test_size=0.20,
+        random_state=123
+    )
+    fit_idx, validation_idx = next(
+        splitter.split(train, groups=train["GAME_ID"])
+    )
+    train_fit = train.iloc[fit_idx].copy()
+    validation = train.iloc[validation_idx].copy()
+
+    assert set(train_fit["GAME_ID"]).isdisjoint(
+        set(validation["GAME_ID"])
+    )
+    print("Training-fit shots:", len(train_fit))
+    print("Validation shots:", len(validation))
+    return train_fit, validation
+
+
 def main():
     if not RAW_PATH.exists():
         raise FileNotFoundError(
-            f"Dataset missing: {RAW_PATH}"
+            f"Dataset missing: {RAW_PATH}. Download and extract shot_logs.csv "
+            "from https://www.kaggle.com/datasets/dansbecker/nba-shot-logs "
+            "into data/raw/ first."
         )
 
     df = pd.read_csv(RAW_PATH)
@@ -214,10 +281,43 @@ def main():
     audit_data(df)
     clean_df = preprocess(df)
     train, test = split_data(clean_df)
+    train_fit, validation = split_validation(train)
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     train.to_csv(OUTPUT_DIR / "train.csv", index=False)
     test.to_csv(OUTPUT_DIR / "test.csv", index=False)
+    train_fit.to_csv(OUTPUT_DIR / "train_fit.csv", index=False)
+    validation.to_csv(OUTPUT_DIR / "validation.csv", index=False)
+
+    clock_audit = prepare_shot_clock(df)
+    clock_excluded = clock_audit.loc[clock_audit["EXCLUDE_SHOT_CLOCK"]].copy()
+    clock_excluded.insert(0, "RAW_ROW_ID", clock_excluded.index)
+    clock_excluded.to_csv(OUTPUT_DIR / "excluded_shot_clock.csv", index=False)
+    clock_sources = clock_audit["SHOT_CLOCK_SOURCE"].value_counts()
+    report = {
+        "raw_rows": len(df),
+        "clean_rows": len(clean_df),
+        "removed_rows_total": len(df) - len(clean_df),
+        "excluded_shot_clock_rows": len(clock_excluded),
+        "excluded_shot_clock_file": "excluded_shot_clock.csv",
+        "raw_shot_clock_sources": {name: int(count) for name, count in clock_sources.items()},
+        "retained_shot_clock_sources": {
+            name: int(count)
+            for name, count in clean_df["SHOT_CLOCK_SOURCE"].value_counts().items()
+        },
+        "missing_clock_policy": "game_clock_proxy_if_0_to_24_seconds_else_drop",
+        "recorded_24_policy": "keep_and_flag_unverified",
+        "splits": {
+            name: {"shots": len(frame), "games": int(frame["GAME_ID"].nunique())}
+            for name, frame in {
+                "train": train, "test": test,
+                "train_fit": train_fit, "validation": validation,
+            }.items()
+        },
+    }
+    (OUTPUT_DIR / "preprocessing_report.json").write_text(
+        json.dumps(report, indent=2) + "\n", encoding="utf-8"
+    )
 
     print("\nSaved processed data successfully!")
 

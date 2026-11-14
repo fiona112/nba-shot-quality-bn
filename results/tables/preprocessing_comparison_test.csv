@@ -1,0 +1,10 @@
+configuration,model,distance_cutoffs,training_shots,test_shots,clock_preprocessing,log_loss,brier_score,accuracy
+original_buckets_missing_state,Hand BN,"0,4,10,16,22,26,inf",100396,25355,same_clean_rows_missing_state,0.657969862689731,0.2330621900040597,0.6149871820153816
+original_buckets_missing_state,Logistic regression,"0,4,10,16,22,26,inf",100396,25355,same_clean_rows_missing_state,0.6603233836865476,0.23403530560345012,0.6095050285939657
+original_buckets_missing_state,Naive Bayes,"0,4,10,16,22,26,inf",100396,25355,same_clean_rows_missing_state,0.6758973761035022,0.24054524248592032,0.6050877538946954
+new_buckets_missing_state,Hand BN,"0,5,10,15,20,25,30,inf",100396,25355,same_clean_rows_missing_state,0.6560833980622234,0.2321980557951286,0.6141589430092684
+new_buckets_missing_state,Logistic regression,"0,5,10,15,20,25,30,inf",100396,25355,same_clean_rows_missing_state,0.6595114469630934,0.23363462559027373,0.609071189114573
+new_buckets_missing_state,Naive Bayes,"0,5,10,15,20,25,30,inf",100396,25355,same_clean_rows_missing_state,0.6753080693101139,0.2402582955731154,0.6029579964504043
+new_buckets_period_proxy,Hand BN,"0,5,10,15,20,25,30,inf",100396,25355,same_clean_rows_period_proxy,0.6560833980622234,0.2321980557951286,0.6141589430092684
+new_buckets_period_proxy,Logistic regression,"0,5,10,15,20,25,30,inf",100396,25355,same_clean_rows_period_proxy,0.6594398315073012,0.23359749845664524,0.6093078288306054
+new_buckets_period_proxy,Naive Bayes,"0,5,10,15,20,25,30,inf",100396,25355,same_clean_rows_period_proxy,0.675182184290212,0.24019452372978764,0.6039045553145336

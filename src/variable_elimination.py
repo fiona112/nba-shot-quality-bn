@@ -29,8 +29,8 @@ class Factor:
 
     Example:
         D     C      p
-        <4    0-2    0.3
-        <4    2-4    0.7
+        <5    0-2    0.3
+        <5    2-4    0.7
     """
 
     def __init__(self, table):
@@ -293,7 +293,7 @@ def main():
     print("\n=== QUERY 2: PARTIAL EVIDENCE ===")
     print(model.query("M", {
         "T": "3",
-        "D": "26+",
+        "D": "30+",
         "H": "<2"
     }))
 
@@ -314,8 +314,8 @@ def main():
     queries = [
         {},
         {"T": "3"},
-        {"T": "3", "D": "26+"},
-        {"T": "3", "D": "26+", "H": "<2"},
+        {"T": "3", "D": "30+"},
+        {"T": "3", "D": "30+", "H": "<2"},
         evidence
     ]
 

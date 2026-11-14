@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 from src.evaluate import evaluate_model
+from src.preprocess import SHOT_DISTANCE_LABELS
 
 
 DATA_DIR = Path("data/processed")
@@ -112,9 +113,9 @@ def main():
     print("Combinations with fewer than 30 shots:",
           (model.cpt["count"] < 30).sum())
 
-    # 6 distance bins × 2 shot types ×
+    # Distance bins × 2 shot types ×
     # 4 defender bins × 3 touch-time bins
-    possible_combinations = 6 * 2 * 4 * 3
+    possible_combinations = len(SHOT_DISTANCE_LABELS) * 2 * 4 * 3
 
     print("Possible combinations:", possible_combinations)
     print("Unobserved combinations:",
