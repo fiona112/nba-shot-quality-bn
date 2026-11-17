@@ -317,3 +317,21 @@ fitted models and prior validation selection; they neither prove conditional
 independence nor include refitting/selection uncertainty or cross-game player
 dependence. Compact tables/figures are committed; detailed identified predictions
 stay in ignored `data/processed/ci_validation_predictions.csv` and can be rebuilt.
+
+### Frozen final comparison
+
+`PYTHONHASHSEED=0 python -m src.final_evaluation` verifies the outer training/test
+files, refits the five prespecified models on all outer-training shots, and
+reports a common random-game test comparison. It separately relearns/refits on
+chronologically earlier dates and evaluates later dates. The original hand
+parents and alpha are retained; no test outcome selects a model, graph,
+threshold, or tuning parameter. Paired primary-hand versus comparator intervals
+resample complete games using the same fixed-fit bootstrap as the sensitivity
+analysis. The test set was inspected by earlier scripts, and chronology reuses
+this same dataset; neither is described as a pristine external holdout.
+
+`final_test_*` and `chronological_*` summaries, calibration figures and provenance
+are saved in `results/`; large per-shot prediction CSVs are written only to ignored
+`data/processed/`. The final evaluator is the documented way to regenerate both
+cohorts together; the original chronological module remains a compatibility entry
+point without the full comparison/provenance checks.

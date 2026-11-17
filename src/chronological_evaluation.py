@@ -27,13 +27,16 @@ FEATURES = ["T", "D", "C", "S", "B", "H"]
 HAND_PARENTS = ["D", "T", "C", "H"]
 
 
-def load_all_data():
+def load_all_data(train=None, test=None):
     """
     Reconstruct the full cleaned dataset from
     the original game-level train/test partition.
     """
-    train = pd.read_csv(DATA_DIR / "train.csv")
-    test = pd.read_csv(DATA_DIR / "test.csv")
+    if (train is None) != (test is None):
+        raise ValueError("Supply both checked train/test frames, or neither.")
+    if train is None:
+        train = pd.read_csv(DATA_DIR / "train.csv")
+        test = pd.read_csv(DATA_DIR / "test.csv")
 
     df = pd.concat(
         [train, test],
