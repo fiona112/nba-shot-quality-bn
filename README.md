@@ -335,3 +335,19 @@ are saved in `results/`; large per-shot prediction CSVs are written only to igno
 `data/processed/`. The final evaluator is the documented way to regenerate both
 cohorts together; the original chronological module remains a compatibility entry
 point without the full comparison/provenance checks.
+
+### Graph interpretation and exact inference
+
+`PYTHONHASHSEED=0 python -m src.interpretation` produces the actual hand/learned
+DAGs, observed make-CPT rows with counts and marginal Beta-prior intervals,
+supported partial-evidence queries, single-run wall-clock timings, and three
+prespecified subsamples of complete training-fit games. These runs never use
+final-test shots. Posterior CPT intervals use a row-wise independent-shot
+likelihood; they are not game-cluster intervals. Subsample edge frequencies are
+exploratory stability descriptions, not confidence levels or causal evidence.
+
+Core variable-elimination tests now use synthetic data, so they run without the
+NBA CSV. The full test suite is `python -m pytest -q` after dependencies are
+installed. Inference complexity grows with intermediate-factor size and CPT
+parent cardinalities; greedy structure learning returns a local solution rather
+than a guarantee of the globally optimal graph.
