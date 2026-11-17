@@ -1,0 +1,8 @@
+nba_game_id,player,shot_number,period,dataset_game_clock,dataset_shot_clock,touch_time,dribbles,shot_distance,official_play_clock,official_gamebook_page,play_context,interpretation,source_url
+0021400860,andre drummond,1,1,7:54,24.0,0.2,0,1.8,07:48,11,tip shot after offensive rebound,putback context; exact release clock unverified,https://statsdmz.nba.com/pdfs/20150227/20150227_NYKDET_Book.pdf
+0021400860,andre drummond,3,2,3:35,24.0,0.0,0,3.2,03:33,14,tip shot after offensive rebound,putback context; exact release clock unverified,https://statsdmz.nba.com/pdfs/20150227/20150227_NYKDET_Book.pdf
+0021400860,andre drummond,8,4,4:35,24.0,0.9,1,5.9,04:34,17,dunk immediately after offensive rebound,putback context; exact release clock unverified,https://statsdmz.nba.com/pdfs/20150227/20150227_NYKDET_Book.pdf
+0021400860,andre drummond,10,5,4:01,24.0,0.4,0,2.0,04:00,19,assisted layup after opponent basket at 04:20,longer possession; literal 24 at release doubtful,https://statsdmz.nba.com/pdfs/20150227/20150227_NYKDET_Book.pdf
+0021400860,andre drummond,11,5,0:48,24.0,1.3,0,4.6,00:43.0,19,missed layup after offensive rebound at 00:46.9,rebound context but several seconds elapsed,https://statsdmz.nba.com/pdfs/20150227/20150227_NYKDET_Book.pdf
+0021400012,gordon hayward,1,1,0:58,24.0,11.2,14,3.0,00:57.8,10,driving slam dunk after opponent turnover at 01:09,longer possession; literal 24 at release doubtful,https://statsdmz.nba.com/pdfs/20141029/20141029_HOUUTA_Book.pdf
+0021400053,aaron brooks,11,4,0:52,24.0,16.7,19,4.5,00:51.9,16,driving layup after opponent basket at 01:14,longer possession; literal 24 at release doubtful,https://statsdmz.nba.com/pdfs/20141104/20141104_ORLCHI_Book.pdf

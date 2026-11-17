@@ -1,12 +1,13 @@
 source,target
 B,C
-B,S
+B,H
+B,T
 C,M
 D,B
 D,C
-D,H
 D,M
 D,S
-H,B
-T,D
+D,T
+S,B
+S,H
 T,H

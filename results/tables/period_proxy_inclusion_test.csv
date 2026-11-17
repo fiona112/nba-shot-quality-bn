@@ -1,0 +1,19 @@
+training_policy,model,distance_cutoffs,training_shots,test_shots,clock_preprocessing,log_loss,brier_score,accuracy,evaluation_cohort,training_proxy_shots
+keep_proxy_training_shots,Hand BN,"0,5,10,15,20,25,30,inf",100396,25355,period_proxy_else_drop_missing_keep_flagged_24,0.6560833980622234,0.2321980557951286,0.6141589430092684,all_clean_test,2810
+keep_proxy_training_shots,Logistic regression,"0,5,10,15,20,25,30,inf",100396,25355,period_proxy_else_drop_missing_keep_flagged_24,0.6594398315073012,0.23359749845664524,0.6093078288306054,all_clean_test,2810
+keep_proxy_training_shots,Naive Bayes,"0,5,10,15,20,25,30,inf",100396,25355,period_proxy_else_drop_missing_keep_flagged_24,0.675182184290212,0.24019452372978764,0.6039045553145336,all_clean_test,2810
+drop_proxy_training_shots,Hand BN,"0,5,10,15,20,25,30,inf",97586,25355,period_proxy_else_drop_missing_keep_flagged_24,0.656131360064758,0.2322785769601675,0.6138434233878919,all_clean_test,0
+drop_proxy_training_shots,Logistic regression,"0,5,10,15,20,25,30,inf",97586,25355,period_proxy_else_drop_missing_keep_flagged_24,0.6593286230806795,0.23357712220821236,0.6092289489252612,all_clean_test,0
+drop_proxy_training_shots,Naive Bayes,"0,5,10,15,20,25,30,inf",97586,25355,period_proxy_else_drop_missing_keep_flagged_24,0.673377466918302,0.23958823473218036,0.6046933543679748,all_clean_test,0
+keep_proxy_training_shots,Hand BN,"0,5,10,15,20,25,30,inf",100396,24617,period_proxy_else_drop_missing_keep_flagged_24,0.6580270105880386,0.233110129126159,0.6118129747735305,recorded_clock_test,2810
+keep_proxy_training_shots,Logistic regression,"0,5,10,15,20,25,30,inf",100396,24617,period_proxy_else_drop_missing_keep_flagged_24,0.6618483992611698,0.23468530740847535,0.6065726936669781,recorded_clock_test,2810
+keep_proxy_training_shots,Naive Bayes,"0,5,10,15,20,25,30,inf",100396,24617,period_proxy_else_drop_missing_keep_flagged_24,0.6777397991015129,0.24137477438626134,0.6011293008896291,recorded_clock_test,2810
+drop_proxy_training_shots,Hand BN,"0,5,10,15,20,25,30,inf",97586,24617,period_proxy_else_drop_missing_keep_flagged_24,0.6578907255831408,0.23309149243404903,0.6117723524393711,recorded_clock_test,0
+drop_proxy_training_shots,Logistic regression,"0,5,10,15,20,25,30,inf",97586,24617,period_proxy_else_drop_missing_keep_flagged_24,0.661696735755499,0.23464687133561957,0.6064508266645001,recorded_clock_test,0
+drop_proxy_training_shots,Naive Bayes,"0,5,10,15,20,25,30,inf",97586,24617,period_proxy_else_drop_missing_keep_flagged_24,0.6760311486778658,0.24077104290552068,0.6020229922411342,recorded_clock_test,0
+keep_proxy_training_shots,Hand BN,"0,5,10,15,20,25,30,inf",100396,738,period_proxy_else_drop_missing_keep_flagged_24,0.5912515423061355,0.20177460160816887,0.6924119241192412,period_proxy_test,2810
+keep_proxy_training_shots,Logistic regression,"0,5,10,15,20,25,30,inf",100396,738,period_proxy_else_drop_missing_keep_flagged_24,0.5790987577986507,0.19731214213252074,0.7005420054200542,period_proxy_test,2810
+keep_proxy_training_shots,Naive Bayes,"0,5,10,15,20,25,30,inf",100396,738,period_proxy_else_drop_missing_keep_flagged_24,0.5898694420005266,0.200825647834919,0.6964769647696477,period_proxy_test,2810
+drop_proxy_training_shots,Hand BN,"0,5,10,15,20,25,30,inf",97586,738,period_proxy_else_drop_missing_keep_flagged_24,0.5974453153953508,0.20516266880225184,0.6829268292682927,period_proxy_test,0
+drop_proxy_training_shots,Logistic regression,"0,5,10,15,20,25,30,inf",97586,738,period_proxy_else_drop_missing_keep_flagged_24,0.5803369838990636,0.19789417604373502,0.7018970189701897,period_proxy_test,0
+drop_proxy_training_shots,Naive Bayes,"0,5,10,15,20,25,30,inf",97586,738,period_proxy_else_drop_missing_keep_flagged_24,0.5848602800955619,0.20013404936210222,0.6937669376693767,period_proxy_test,0
