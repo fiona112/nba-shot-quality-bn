@@ -1,0 +1,9 @@
+claim_id,model,x,y,given,graph_implied,split,input_shots,shots,dropped_missing_shots,x_states,y_states,conditioning_strata,informative_strata,effective_table_cells,empty_joint_cells,global_grid_zero_expected_cells,expected_cells_below_5,expected_cells_below_1,degrees_of_freedom_descriptive,cmi_nats,g2_descriptive,shots_in_sparse_informative_strata_fraction,shots_in_constant_strata_fraction
+hand_clock,Hand BN,M,S,"D,T,C,H",True,train_fit,80427,80427,0,2,6,137,102,1153,89,491,366,150,451,0.004954812499153261,797.0014097387985,0.29882999490220946,0.0009822572021833463
+hand_dribbles,Hand BN,M,B,"D,T,C,H",True,train_fit,80427,80427,0,2,5,137,102,890,80,480,347,131,320,0.0026020019497504697,418.54242162516204,0.7129197906175787,0.0010195581085953721
+hand_joint,Hand BN,M,"S,B","D,T,C,H",True,train_fit,80427,80427,0,2,30,137,103,3626,545,4594,2030,933,1684,0.014817731926771993,2383.491451348982,0.999042610068758,0.0009573899312419958
+hand_roots,Hand BN,S,D,,True,train_fit,80427,80427,0,6,7,1,1,42,0,0,0,0,30,0.05685245147061576,9144.944228854427,0.0,0.0
+nb_distance_type,Naive Bayes,D,T,M,True,train_fit,80427,80427,0,7,2,2,2,28,3,0,0,0,12,0.40879532189173956,65756.36270757388,0.0,0.0
+nb_dribbles_touch,Naive Bayes,B,H,M,True,train_fit,80427,80427,0,5,3,2,2,30,1,0,0,0,16,0.5539489591617835,89104.90587700953,0.0,0.0
+learned_touch,Learned BN,M,H,"C,D",True,train_fit,80427,80427,0,2,3,28,27,165,1,3,12,3,54,0.00255215824544013,410.5248624120267,0.016860009698235666,0.0002486727094135054
+learned_joint,Learned BN,M,"T,S,B,H","C,D",True,train_fit,80427,80427,0,2,164,28,27,3671,590,5513,2065,1017,1805,0.018117511644023237,2914.2742179877137,0.9997513272905865,0.0002486727094135054

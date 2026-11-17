@@ -294,3 +294,14 @@ in `src/graphs.py`, shared by CPT prediction, full inference, and comparison.
 joint outcome claim `M independent of {S,B} given {D,T,C,H}`. These are model
 assumptions, not evidence that observed shots satisfy independence or causality.
 The learned outcome claims use the verified graph's actual parent set.
+
+### Empirical conditional-dependence diagnostics
+
+`python -m src.conditional_independence` computes plug-in conditional mutual
+information (CMI, in nats) on training-fit shots for the declared graph claims.
+It reports complete-case counts, effective/empty table cells, expected-count
+support, and the fraction of shots in sparse or constant strata. The descriptive
+`G2 = 2*N*CMI` statistic is not assigned a chi-square p-value: shots are clustered
+within games/players, and high-dimensional tables can be sparse. Positive CMI is
+upward biased in finite samples and does not by itself reject a graph assumption.
+Joint claims are measured jointly, rather than inferred from pairwise checks.
