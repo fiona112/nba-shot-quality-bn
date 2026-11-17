@@ -1,0 +1,16 @@
+fold,training_shots,prediction_shots,training_games,prediction_games,unseen_parent_shots,minimum_training_parent_count,analysis
+0,100599,25152,724,180,1,0,full
+1,100602,25149,724,180,3,0,full
+2,100600,25151,724,180,5,0,full
+3,100603,25148,720,184,2,0,full
+4,100600,25151,724,180,2,0,full
+0,49648,12416,350,90,4,0,first
+1,49649,12415,352,88,4,0,first
+2,49655,12409,352,88,1,0,first
+3,49652,12412,353,87,2,0,first
+4,49652,12412,353,87,5,0,first
+0,50960,12727,368,96,4,0,second
+1,50945,12742,372,92,4,0,second
+2,50947,12740,372,92,1,0,second
+3,50948,12739,372,92,6,0,second
+4,50948,12739,372,92,4,0,second
