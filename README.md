@@ -108,6 +108,9 @@ python -m src.variable_elimination
 python -m pytest tests/test_variable_elimination.py -v
 python -m src.structure_learning
 python -m src.ablation
+python -m src.calibration
+python -m src.chronological_evaluation
+python -m src.player_comparison
 ```
 
 Use Python 3.11 and install dependencies with `pip install -r requirements.txt`.
