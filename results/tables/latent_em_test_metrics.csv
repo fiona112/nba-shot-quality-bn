@@ -1,2 +1,2 @@
-model,log_loss,brier_score,accuracy,ece
-Latent BN (K=18),0.6585369685930014,0.23343710196604733,0.6057976730427923,0.007363629221664516
+model,k,selected_seed,validation_selected_seed,validation_log_loss,training_shots,evaluation_shots,training_games,evaluation_games,train_log_likelihood,train_map_objective,iterations,converged,hit_iteration_cap,log_loss,brier_score,accuracy,ece
+Latent BN (K=18),18,3,4,0.6517849448717526,100396,25355,723,181,-673579.0006525852,-675307.1681228817,1000,False,True,0.6585368893363082,0.23343707018316645,0.6057976730427923,0.007363717690965963
