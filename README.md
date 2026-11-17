@@ -61,6 +61,38 @@ Percentages refer to games; shot counts vary by game. Rerunning preprocessing
 reproduces the same splits and replaces the processed files. A cleaning and split
 summary is saved as `data/processed/preprocessing_report.json`.
 
+Every retained shot and clock-exclusion row includes `RAW_ROW_ID`, its zero-based
+position among the parsed rows in the raw CSV (excluding the header). It is
+assigned before cleaning and preserved in all four splits. Use the pair
+`(raw-file SHA256, RAW_ROW_ID)` to identify a shot across experiment outputs;
+reordering or replacing the raw file changes that identity. `RAW_ROW_ID` and
+`GAME_ID` are metadata, not model predictors.
+
+The preprocessing report also records:
+
+- The raw file's SHA256 checksum and size, plus checksums of the four split CSVs
+  and the clock-exclusion CSV.
+- Git commit and dirty-worktree status, Python/platform details, and exact
+  installed package versions. Git values are `null` for exported source trees
+  or when Git is unavailable.
+- SHA256 checksums of Python source files and `requirements.txt`, so an
+  uncommitted code change is distinguishable from its base commit.
+- Predictor names, all bin edges/labels/source columns, clock policies, and the
+  game-level split seeds/fractions and resulting shot/game counts.
+
+The report uses strict JSON: infinite bin boundaries are written as the strings
+`"-inf"` and `"inf"`. Its UTC timestamp changes on each run; split CSV checksums
+should match when data, code, settings, and package versions match. Requirements
+specify compatible version ranges; the report captures the actual environment.
+Keep the report with any experiment outputs you share so their inputs can be
+checked. Raw data, processed data, and `.venv` remain excluded from Git.
+
+To check preprocessing and provenance without downloading the dataset:
+
+```bash
+python -m pytest tests/test_preprocess.py tests/test_provenance.py -v
+```
+
 Shot-clock preprocessing uses the following policy:
 
 - For a missing `SHOT_CLOCK` with a valid game clock between 0 and 24 seconds
@@ -110,7 +142,8 @@ python -m src.structure_learning
 python -m src.ablation
 ```
 
-Use Python 3.11 and install dependencies with `pip install -r requirements.txt`.
+Use Python 3.11 or 3.12 and install dependencies with
+`python -m pip install -r requirements.txt`.
 
 ### Bucket and Shot-Clock Diagnostics
 
@@ -179,12 +212,12 @@ Games are separated between training and testing.
 
 ## Setup
 
-Python 3.11 or 3.12 recommended.
+Use Python 3.11 or 3.12. For example, with Python 3.12 installed:
 
 ```bash
-python3 -m venv .venv
+python3.12 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 ## Run
