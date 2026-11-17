@@ -6,16 +6,17 @@ import pandas as pd
 from src.evaluate import evaluate_model
 from src.structure_learning import (
     ConditionalMakeModel,
+    HAND_PARENTS,
     prepare_data,
 )
+from src.validation import load_learned_parents, load_validation_data, write_validation_metadata
 
 
 DATA_DIR = Path("data/processed")
 RESULTS_DIR = Path("results/tables")
 
 CONFIGURATIONS = {
-    "Learned parents (D,C)": ["D", "C"],
-    "Hand BN": ["D", "T", "C", "H"],
+    "Hand BN": HAND_PARENTS,
     "Hand BN + dribbles": ["D", "T", "C", "H", "B"],
     "Hand BN + shot clock": ["D", "T", "C", "H", "S"],
     "Hand BN + both": ["D", "T", "C", "H", "B", "S"],
@@ -29,16 +30,14 @@ ALPHA = 1.0
 
 
 def main():
-    train = prepare_data(
-        pd.read_csv(DATA_DIR / "train_fit.csv")
-    )
-    validation = prepare_data(
-        pd.read_csv(DATA_DIR / "validation.csv")
-    )
+    train_raw, val_raw, cohort = load_validation_data(DATA_DIR)
+    train = prepare_data(train_raw)
+    validation = prepare_data(val_raw)
+    configurations = {"Learned BN": load_learned_parents(RESULTS_DIR, cohort), **CONFIGURATIONS}
 
     results = []
 
-    for name, parents in CONFIGURATIONS.items():
+    for name, parents in configurations.items():
         print(f"\n{'=' * 55}")
         print(name)
         print("Parents:", parents)
@@ -77,6 +76,8 @@ def main():
 
         results.append({
             "model": name,
+            "training_shots": len(train),
+            "validation_shots": len(validation),
             "parents": ",".join(parents),
             "num_parents": len(parents),
             "possible_combinations": possible,
@@ -93,6 +94,14 @@ def main():
     results_df.to_csv(
         RESULTS_DIR / "ablation_validation.csv",
         index=False
+    )
+    write_validation_metadata(
+        RESULTS_DIR / "ablation_validation_metadata.json",
+        "ablation_validation",
+        cohort,
+        {"alpha": ALPHA, "make_parents": configurations},
+        [RESULTS_DIR / "ablation_validation.csv"],
+        [RESULTS_DIR / "learned_edges.csv", RESULTS_DIR / "structure_validation_metadata.json"],
     )
 
     print("\n=== FINAL ABLATION COMPARISON ===")

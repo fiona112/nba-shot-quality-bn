@@ -5,14 +5,12 @@ import numpy as np
 import pandas as pd
 
 from src.evaluate import evaluate_model
+from src.graphs import HAND_PARENTS as MAKE_PARENTS
 from src.preprocess import SHOT_DISTANCE_LABELS
 
 
 DATA_DIR = Path("data/processed")
 RESULTS_DIR = Path("results/tables")
-
-# Parents of M in our hand-designed Bayesian network
-MAKE_PARENTS = ["D", "T", "C", "H"]
 
 ALPHA = 1.0
 

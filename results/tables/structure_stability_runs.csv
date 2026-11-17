@@ -1,0 +1,4 @@
+seed,game_fraction,training_games,training_shots,edge_count,make_parents,learning_seconds
+13,0.8,463,64426,11,"C,D",0.23750362504506484
+37,0.8,463,64596,12,"C,D",0.22037495899712667
+73,0.8,463,64325,12,"C,D",0.2123827909817919

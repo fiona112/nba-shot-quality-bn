@@ -1,2 +1,2 @@
-split_date,min_shots_per_half,players,correlation
-2014-12-27,100,214,0.4470006202404993
+split_date,min_shots_per_half,players,correlation,first_shots,first_games,second_shots,second_games
+2014-12-27,100,214,0.44457248099956953,62064,440,63687,464

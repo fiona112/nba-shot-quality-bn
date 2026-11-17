@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from sklearn.calibration import calibration_curve
 from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
@@ -13,47 +12,25 @@ from sklearn.preprocessing import OneHotEncoder
 
 from src.naive_bayes import NaiveBayesShotModel
 from src.structure_learning import (
+    ALPHA,
     ConditionalMakeModel,
+    FEATURES,
+    HAND_PARENTS,
     prepare_data,
 )
 from src.evaluate import evaluate_model
+from src.validation import load_learned_parents, load_validation_data, write_validation_metadata
 
 
 DATA_DIR = Path("data/processed")
 FIG_DIR = Path("results/figures")
 TABLE_DIR = Path("results/tables")
 
-FEATURES = ["T", "D", "C", "S", "B", "H"]
-HAND_PARENTS = ["D", "T", "C", "H"]
 N_BINS = 10
+LOGISTIC_MAX_ITER = 1000
 
 
-def load_learned_parents():
-    """
-    Read the learned graph from the previous
-    structure-learning experiment.
-    """
-    path = TABLE_DIR / "learned_edges.csv"
-
-    if not path.exists():
-        raise FileNotFoundError(
-            "Missing learned_edges.csv. Run "
-            "'python -m src.structure_learning' first."
-        )
-
-    edges = pd.read_csv(path)
-
-    parents = sorted(
-        edges.loc[
-            edges["target"] == "M", "source"
-        ].tolist()
-    )
-
-    print("Learned make-node parents:", parents)
-    return parents
-
-
-def get_predictions(train, validation):
+def get_predictions(train, validation, learned_parents):
     """
     Train each model on train_fit only and
     predict on the same validation examples.
@@ -88,7 +65,7 @@ def get_predictions(train, validation):
         ),
         (
             "classifier",
-            LogisticRegression(max_iter=1000)
+            LogisticRegression(max_iter=LOGISTIC_MAX_ITER)
         )
     ])
 
@@ -99,7 +76,7 @@ def get_predictions(train, validation):
     )
 
     # 3. Naive Bayes
-    nb = NaiveBayesShotModel(alpha=1.0)
+    nb = NaiveBayesShotModel(alpha=ALPHA)
     nb.fit(X_train, y_train)
 
     predictions["Naive Bayes"] = (
@@ -109,7 +86,7 @@ def get_predictions(train, validation):
     # 4. Hand-designed BN make CPT
     hand = ConditionalMakeModel(
         parents=HAND_PARENTS,
-        alpha=1.0
+        alpha=ALPHA
     )
     hand.fit(train)
 
@@ -118,11 +95,9 @@ def get_predictions(train, validation):
     )
 
     # 5. Learned BN make CPT
-    learned_parents = load_learned_parents()
-
     learned = ConditionalMakeModel(
         parents=learned_parents,
-        alpha=1.0
+        alpha=ALPHA
     )
     learned.fit(train)
 
@@ -171,16 +146,32 @@ def calculate_calibration(y_true, probabilities):
     return table, float(ece)
 
 
+def plot_bin_counts(calibration_bins, path):
+    """Show support for the same bins used by the reliability curves."""
+    fig, axes = plt.subplots(3, 2, figsize=(10, 9), sharex=True, layout="constrained")
+    for ax, (name, table) in zip(axes.flat, calibration_bins.groupby("model", sort=False)):
+        counts = table.set_index("bin")["count"].reindex(range(N_BINS), fill_value=0)
+        ax.bar((np.arange(N_BINS) + 0.5) / N_BINS, counts, width=0.085)
+        ax.set_title(name)
+        ax.set_ylabel("Validation shots")
+        ax.set_xlim(0, 1)
+        ax.set_xticks(np.linspace(0, 1, 6))
+        ax.tick_params(labelbottom=True)
+        ax.grid(axis="y", alpha=0.2)
+    axes.flat[-1].set_visible(False)
+    fig.supxlabel("Predicted make probability (10 equal-width bins)")
+    fig.suptitle("Calibration bin support on validation shots")
+    fig.savefig(path, dpi=300, bbox_inches="tight")
+    plt.close(fig)
+
+
 def main():
     FIG_DIR.mkdir(parents=True, exist_ok=True)
     TABLE_DIR.mkdir(parents=True, exist_ok=True)
 
-    train_raw = pd.read_csv(
-        DATA_DIR / "train_fit.csv"
-    )
-    val_raw = pd.read_csv(
-        DATA_DIR / "validation.csv"
-    )
+    train_raw, val_raw, cohort = load_validation_data(DATA_DIR)
+    learned_parents = load_learned_parents(TABLE_DIR, cohort)
+    print("Learned make-node parents:", learned_parents)
 
     # Match the feature preparation used in
     # the structure-learning experiment.
@@ -191,7 +182,7 @@ def main():
     print("Validation shots:", len(validation))
 
     y_val, predictions = get_predictions(
-        train, validation
+        train, validation, learned_parents
     )
 
     metric_rows = []
@@ -228,6 +219,8 @@ def main():
 
         metric_rows.append({
             "model": name,
+            "training_shots": len(train),
+            "validation_shots": len(validation),
             **metrics,
             "ece": ece
         })
@@ -246,7 +239,7 @@ def main():
     ax.set_xlabel("Mean Predicted Make Probability")
     ax.set_ylabel("Observed Make Rate")
     ax.set_title(
-        "NBA Shot Quality: Calibration Comparison"
+        "NBA Shot Quality: Validation Calibration"
     )
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
@@ -273,18 +266,18 @@ def main():
     )
 
     # Save individual calibration bins
-    pd.concat(
+    calibration_bins = pd.concat(
         calibration_tables,
         ignore_index=True
-    ).to_csv(
+    )
+    calibration_bins.to_csv(
         TABLE_DIR / "calibration_bins.csv",
         index=False
     )
 
     # Save per-shot predictions
-    prediction_df = pd.DataFrame({
-        "actual": y_val.to_numpy()
-    })
+    prediction_df = val_raw[["RAW_ROW_ID", "GAME_ID"]].reset_index(drop=True).copy()
+    prediction_df["actual"] = y_val.to_numpy()
 
     for name, probs in predictions.items():
         prediction_df[name] = probs
@@ -292,6 +285,29 @@ def main():
     prediction_df.to_csv(
         TABLE_DIR / "validation_predictions.csv",
         index=False
+    )
+    count_figure = FIG_DIR / "calibration_bin_counts.png"
+    plot_bin_counts(calibration_bins, count_figure)
+    write_validation_metadata(
+        TABLE_DIR / "calibration_metadata.json",
+        "calibration",
+        cohort,
+        {
+            "alpha": ALPHA,
+            "logistic_max_iter": LOGISTIC_MAX_ITER,
+            "calibration_bins": N_BINS,
+            "binning": "equal_width; left-closed except final bin also includes 1",
+            "hand_parents": HAND_PARENTS,
+            "learned_parents": learned_parents,
+        },
+        [
+            TABLE_DIR / "calibration_metrics.csv",
+            TABLE_DIR / "calibration_bins.csv",
+            TABLE_DIR / "validation_predictions.csv",
+            figure_path,
+            count_figure,
+        ],
+        [TABLE_DIR / "learned_edges.csv", TABLE_DIR / "structure_validation_metadata.json"],
     )
 
     print("\n=== FINAL COMPARISON ===")

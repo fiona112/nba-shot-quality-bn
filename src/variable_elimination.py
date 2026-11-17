@@ -6,21 +6,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from src.graphs import HAND_PARENT_MAP as PARENTS, VARIABLES
 
 DATA_DIR = Path("data/processed")
-
-# Parent sets from our proposed BN
-PARENTS = {
-    "S": [],
-    "D": [],
-    "B": ["S"],
-    "H": ["S", "B"],
-    "T": ["D"],
-    "C": ["D", "B"],
-    "M": ["D", "T", "C", "H"],
-}
-
-VARIABLES = list(PARENTS.keys())
 
 
 class Factor:

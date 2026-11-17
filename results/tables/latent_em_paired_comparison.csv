@@ -1,0 +1,2 @@
+comparison,k,positive_favors,log_loss_improvement,ci95_low,ci95_high,games,shots,bootstrap_replicates,bootstrap_seed
+Latent BN versus fixed hand BN,18,Latent BN,-0.002453491274084867,-0.003925187290308351,-0.000993347371771999,181,25355,1000,20261117

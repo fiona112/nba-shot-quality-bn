@@ -1,0 +1,12 @@
+source,target
+B,C
+B,D
+B,S
+B,T
+C,M
+D,C
+D,M
+D,S
+D,T
+H,B
+H,D

@@ -1,0 +1,6 @@
+operation,seconds,calls
+fit:hand_full_bn,0.44641700002830476,1
+query:population,0.0076312090386636555,1
+query:close_two_tight_defender,0.007211165968328714,1
+query:close_two_open,0.00685470801545307,1
+query:long_three_moderate_defender,0.006172291992697865,1
