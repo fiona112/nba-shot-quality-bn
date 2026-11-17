@@ -173,7 +173,9 @@ python -m src.naive_bayes
 python -m src.bayesian_network
 python -m src.variable_elimination
 python -m pytest tests/test_variable_elimination.py -v
-PYTHONHASHSEED=0 python -m src.chronological_evaluation
+python -m src.player_comparison
+python -m src.latent_em  # ~30 min: 14 values of K x 5 EM restarts
+PYTHONHASHSEED=0 python -m src.final_evaluation
 ```
 
 Use validation for model selection. The chronological experiment uses a separate
