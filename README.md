@@ -305,3 +305,15 @@ support, and the fraction of shots in sparse or constant strata. The descriptive
 within games/players, and high-dimensional tables can be sparse. Positive CMI is
 upward biased in finite samples and does not by itself reject a graph assumption.
 Joint claims are measured jointly, rather than inferred from pairwise checks.
+
+### Predictive sensitivity and clustered uncertainty
+
+`python -m src.ci_sensitivity` compares matched make-parent sets on the same
+validation shots. Positive log-loss improvement favors adding the feature.
+Intervals use 1,000 seeded paired game-cluster bootstrap draws: sample games
+with replacement and retain every shot from each sampled game, weighting shots
+equally within each replicate. These are exploratory intervals conditional on
+fitted models and prior validation selection; they neither prove conditional
+independence nor include refitting/selection uncertainty or cross-game player
+dependence. Compact tables/figures are committed; detailed identified predictions
+stay in ignored `data/processed/ci_validation_predictions.csv` and can be rebuilt.
