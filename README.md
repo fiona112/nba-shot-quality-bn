@@ -132,15 +132,55 @@ before using the saved result tables; existing tables may use earlier buckets.
 
 ### Running the Experiments
 
+Run the validation experiments in this order after preprocessing:
+
+```bash
+PYTHONHASHSEED=0 python -m src.structure_learning
+PYTHONHASHSEED=0 python -m src.ablation
+PYTHONHASHSEED=0 python -m src.calibration
+```
+
+These three commands use only `train_fit.csv` and `validation.csv`. They verify
+the input checksums against `preprocessing_report.json` and reject overlapping
+shot/game identifiers. Ablation and calibration load the current learned graph
+and require its provenance to match those inputs. `PYTHONHASHSEED=0` fixes Python
+set iteration for hill-climbing ties; the value is recorded with package versions
+and source hashes. Equivalent-score graph orientations may otherwise differ.
+The dependency range keeps the existing pgmpy estimator interface; this run was
+verified with pgmpy 1.1.2.
+
+Each command saves a JSON sidecar in `results/tables/`:
+`structure_validation_metadata.json`, `ablation_validation_metadata.json`, or
+`calibration_metadata.json`. These include input counts/checksums, a copy of the
+preprocessing report, model settings, code/environment provenance, dependencies,
+and output checksums. The metadata travels with the results even though the
+processed data is excluded from Git. `validation_predictions.csv` includes
+`RAW_ROW_ID`, `GAME_ID`, the target (`actual`), and all five models' probabilities.
+
+Calibration regenerates both `calibration_comparison.png` and
+`calibration_bin_counts.png` from the same validation shots. The metrics tables
+include training/validation shot counts. The shared hand-BN metrics should agree
+across structure, ablation, and calibration; the learned-BN metrics should also
+agree across all three. Results preceding this synchronization remain available
+in Git at commit `d17a9340257877eb52208853b9b2de680d23fc42`.
+
+Additional commands for the existing test-set comparisons, inference checks,
+and chronological robustness experiment are:
+
 ```bash
 python -m src.baselines
 python -m src.naive_bayes
 python -m src.bayesian_network
 python -m src.variable_elimination
 python -m pytest tests/test_variable_elimination.py -v
-python -m src.structure_learning
-python -m src.ablation
+PYTHONHASHSEED=0 python -m src.chronological_evaluation
 ```
+
+Use validation for model selection. The chronological experiment uses a separate
+date-based partition, so its metrics should be labeled separately from validation
+and the random-game test results. Run it separately when regenerating those
+outputs; rerunning the three validation commands does not update chronology or
+test-set result files.
 
 Use Python 3.11 or 3.12 and install dependencies with
 `python -m pip install -r requirements.txt`.

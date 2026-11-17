@@ -2,6 +2,7 @@
 
 import hashlib
 from importlib import metadata
+import os
 from pathlib import Path
 import platform
 import subprocess
@@ -52,6 +53,7 @@ def collect_provenance():
         "git": git_metadata(REPO_ROOT),
         "python_version": platform.python_version(),
         "platform": platform.platform(),
+        "python_hash_seed": os.environ.get("PYTHONHASHSEED"),
         "packages": dict(sorted(packages.items())),
         "source_files_sha256": {
             str(path.relative_to(REPO_ROOT)): file_sha256(path)
