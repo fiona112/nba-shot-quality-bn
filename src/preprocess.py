@@ -1,10 +1,13 @@
 
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import GroupShuffleSplit
+
+from src.provenance import collect_provenance, file_sha256
 
 
 RAW_PATH = Path("data/raw/shot_logs.csv")
@@ -13,6 +16,37 @@ OUTPUT_DIR = Path("data/processed")
 FEATURES = ["T", "D", "C", "S", "B", "H"]
 SHOT_DISTANCE_BINS = [0, 5, 10, 15, 20, 25, 30, np.inf]
 SHOT_DISTANCE_LABELS = ["<5", "5-10", "10-15", "15-20", "20-25", "25-30", "30+"]
+FEATURE_BINNING = {
+    "D": {
+        "source": "SHOT_DIST",
+        "edges": SHOT_DISTANCE_BINS,
+        "labels": SHOT_DISTANCE_LABELS,
+    },
+    "C": {
+        "source": "CLOSE_DEF_DIST",
+        "edges": [-np.inf, 2, 4, 6, np.inf],
+        "labels": ["0-2", "2-4", "4-6", "6+"],
+    },
+    "S": {
+        "source": "SHOT_CLOCK_EFFECTIVE",
+        "edges": [-np.inf, 4, 7, 15, 18, 22, np.inf],
+        "labels": ["0-4", "4-7", "7-15", "15-18", "18-22", "22+"],
+    },
+    "B": {
+        "source": "DRIBBLES",
+        "edges": [-np.inf, 1, 2, 3, 7, np.inf],
+        "labels": ["0", "1", "2", "3-6", "7+"],
+    },
+    "H": {
+        "source": "TOUCH_TIME",
+        "edges": [-np.inf, 2, 6, np.inf],
+        "labels": ["<2", "2-6", "6+"],
+    },
+}
+OUTER_TEST_FRACTION = 0.20
+OUTER_SPLIT_SEED = 42
+VALIDATION_FRACTION = 0.20
+VALIDATION_SPLIT_SEED = 123
 REQUIRED = [
     "GAME_ID", "GAME_CLOCK", "SHOT_RESULT", "PTS_TYPE",
     "SHOT_DIST", "CLOSE_DEF_DIST",
@@ -160,46 +194,15 @@ def preprocess(df):
     # Shot type
     df["T"] = df["PTS_TYPE"].astype(int).astype(str)
 
-    # Five-foot distance ranges, with 30+ feet kept separate for deep attempts.
-    df["D"] = pd.cut(
-        df["SHOT_DIST"],
-        bins=SHOT_DISTANCE_BINS,
-        labels=SHOT_DISTANCE_LABELS,
-        right=False
-    )
-
-    # Closest defender distance (feet)
-    df["C"] = pd.cut(
-        df["CLOSE_DEF_DIST"],
-        bins=[-np.inf, 2, 4, 6, np.inf],
-        labels=["0-2", "2-4", "4-6", "6+"],
-        right=False
-    )
-
-    # Use game-clock time as a flagged proxy only for missing end-period clocks.
-    df["S"] = pd.cut(
-        df["SHOT_CLOCK_EFFECTIVE"],
-        bins=[-np.inf, 4, 7, 15, 18, 22, np.inf],
-        labels=["0-4", "4-7", "7-15",
-                "15-18", "18-22", "22+"],
-        right=False
-    )
-
-    # Dribbles
-    df["B"] = pd.cut(
-        df["DRIBBLES"],
-        bins=[-np.inf, 1, 2, 3, 7, np.inf],
-        labels=["0", "1", "2", "3-6", "7+"],
-        right=False
-    )
-
-    # Touch time (seconds)
-    df["H"] = pd.cut(
-        df["TOUCH_TIME"],
-        bins=[-np.inf, 2, 6, np.inf],
-        labels=["<2", "2-6", "6+"],
-        right=False
-    )
+    # Use the same definitions for discretization and the reproducibility report.
+    # S uses the effective clock, including the flagged end-of-period proxies.
+    for feature, definition in FEATURE_BINNING.items():
+        df[feature] = pd.cut(
+            df[definition["source"]],
+            bins=definition["edges"],
+            labels=definition["labels"],
+            right=False,
+        )
 
     print("\n=== BIN COUNTS ===")
     for col in FEATURES:
@@ -217,8 +220,8 @@ def preprocess(df):
 def split_data(df):
     splitter = GroupShuffleSplit(
         n_splits=1,
-        test_size=0.20,
-        random_state=42
+        test_size=OUTER_TEST_FRACTION,
+        random_state=OUTER_SPLIT_SEED
     )
 
     train_idx, test_idx = next(
@@ -245,8 +248,8 @@ def split_validation(train):
     """Reserve 20% of training games for model selection, keeping test untouched."""
     splitter = GroupShuffleSplit(
         n_splits=1,
-        test_size=0.20,
-        random_state=123
+        test_size=VALIDATION_FRACTION,
+        random_state=VALIDATION_SPLIT_SEED
     )
     fit_idx, validation_idx = next(
         splitter.split(train, groups=train["GAME_ID"])
@@ -278,6 +281,17 @@ def main():
             f"Missing required columns: {missing_cols}"
         )
 
+    if "RAW_ROW_ID" in df.columns:
+        raise ValueError("RAW_ROW_ID is reserved for the original CSV row position.")
+    # Assign before cleaning/splitting; an ID is scoped to this raw file's SHA256.
+    df.insert(0, "RAW_ROW_ID", np.arange(len(df)))
+    raw_input = {
+        "file": RAW_PATH.name,
+        "size_bytes": RAW_PATH.stat().st_size,
+        "sha256": file_sha256(RAW_PATH),
+        "row_id": "zero-based parsed data-row position, excluding header",
+    }
+
     audit_data(df)
     clean_df = preprocess(df)
     train, test = split_data(clean_df)
@@ -291,15 +305,43 @@ def main():
 
     clock_audit = prepare_shot_clock(df)
     clock_excluded = clock_audit.loc[clock_audit["EXCLUDE_SHOT_CLOCK"]].copy()
-    clock_excluded.insert(0, "RAW_ROW_ID", clock_excluded.index)
     clock_excluded.to_csv(OUTPUT_DIR / "excluded_shot_clock.csv", index=False)
     clock_sources = clock_audit["SHOT_CLOCK_SOURCE"].value_counts()
     report = {
+        "schema_version": 2,
+        "created_at_utc": datetime.now(timezone.utc).isoformat(),
+        "raw_input": raw_input,
+        "provenance": collect_provenance(),
+        "predictors": FEATURES,
+        "discretization": {
+            "T": {"source": "PTS_TYPE", "states": ["2", "3"]},
+            **{
+                feature: {
+                    "source": definition["source"],
+                    "edges": [
+                        str(edge) if np.isinf(edge) else edge
+                        for edge in definition["edges"]
+                    ],
+                    "labels": definition["labels"],
+                    "closed": "left",
+                }
+                for feature, definition in FEATURE_BINNING.items()
+            },
+        },
+        "split_config": {
+            "group": "GAME_ID",
+            "outer": {"test_fraction": OUTER_TEST_FRACTION, "seed": OUTER_SPLIT_SEED},
+            "validation": {
+                "fraction_of_train": VALIDATION_FRACTION,
+                "seed": VALIDATION_SPLIT_SEED,
+            },
+        },
         "raw_rows": len(df),
         "clean_rows": len(clean_df),
         "removed_rows_total": len(df) - len(clean_df),
         "excluded_shot_clock_rows": len(clock_excluded),
         "excluded_shot_clock_file": "excluded_shot_clock.csv",
+        "excluded_shot_clock_sha256": file_sha256(OUTPUT_DIR / "excluded_shot_clock.csv"),
         "raw_shot_clock_sources": {name: int(count) for name, count in clock_sources.items()},
         "retained_shot_clock_sources": {
             name: int(count)
@@ -308,7 +350,12 @@ def main():
         "missing_clock_policy": "game_clock_proxy_if_0_to_24_seconds_else_drop",
         "recorded_24_policy": "keep_and_flag_unverified",
         "splits": {
-            name: {"shots": len(frame), "games": int(frame["GAME_ID"].nunique())}
+            name: {
+                "shots": len(frame),
+                "games": int(frame["GAME_ID"].nunique()),
+                "file": f"{name}.csv",
+                "sha256": file_sha256(OUTPUT_DIR / f"{name}.csv"),
+            }
             for name, frame in {
                 "train": train, "test": test,
                 "train_fit": train_fit, "validation": validation,
@@ -316,7 +363,7 @@ def main():
         },
     }
     (OUTPUT_DIR / "preprocessing_report.json").write_text(
-        json.dumps(report, indent=2) + "\n", encoding="utf-8"
+        json.dumps(report, indent=2, allow_nan=False) + "\n", encoding="utf-8"
     )
 
     print("\nSaved processed data successfully!")
