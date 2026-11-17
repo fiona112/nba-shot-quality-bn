@@ -174,7 +174,7 @@ python -m src.bayesian_network
 python -m src.variable_elimination
 python -m pytest tests/test_variable_elimination.py -v
 python -m src.player_comparison
-python -m src.latent_em  # ~30 min: 14 values of K x 5 EM restarts
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 PYTHONHASHSEED=0 python -m src.latent_em
 PYTHONHASHSEED=0 python -m src.final_evaluation
 ```
 
@@ -284,8 +284,17 @@ shot-type labels.
 
 ## AI Assistance
 
-We will document AI-assisted code and writing contributions
-according to course requirements.
+Codex assisted with repository review, provenance checks, conditional-independence
+analysis, uncertainty estimates, common-cohort evaluation, tests, figures, and
+revisions to the team's report. Team members must review and understand the final
+work and adapt the disclosure according to course requirements.
+
+## Report
+
+The compiled review draft is `report/main.pdf`, with editable LaTeX in
+`report/main.tex` and build instructions in `report/README.md`. Its tables are
+generated from verified result artifacts. Contributions and reflections await
+team completion. Anna's merged EM and player analyses are integrated and reproduced.
 
 ### Graph assumptions
 
@@ -353,3 +362,29 @@ NBA CSV. The full test suite is `python -m pytest -q` after dependencies are
 installed. Inference complexity grows with intermediate-factor size and CPT
 parent cardinalities; greedy structure learning returns a local solution rather
 than a guarantee of the globally optimal graph.
+
+### EM and player extensions from PR #4
+
+`python -m src.latent_em` preserves Anna's latent-class model, 14-value K grid,
+and five seeded restarts. It selects each restart by training MAP objective,
+selects K by validation log loss, then refits on the verified outer-training
+cohort. Test shot IDs match the common final evaluator. Add-one pseudocounts
+are Dirichlet(2) MAP updates. Frequency compression preserves the original
+per-shot initialization and weighted EM updates; limiting BLAS threads to one
+avoids overhead on these small matrices (see the command above).
+
+`latent_em_*` tables/metadata record selection, restart objectives, iteration
+caps, calibration, and paired game-cluster comparisons. The selected K=18 final
+fit reaches the fixed 1,000-iteration cap without meeting tolerance; its result
+is reported with that limitation. Detailed trace/prediction CSVs are ignored
+under `data/processed/`. Returned parameters now match recorded objectives at
+the cap, and prediction accepts features without an outcome column.
+
+`python -m src.player_comparison` gives every cleaned shot a prediction from
+five-fold complete-game cross-fitting of the fixed hand CPT. It records shot
+IDs, fold exclusion, and parent support. The two chronological halves are
+cross-fitted independently, so neither half's outcomes train the other's
+residual model. This is exploratory use of all cleaned shots, including the
+earlier random test cohort, and does not supply new holdout performance.
+Residuals combine shooting, omitted context, sampling noise, and model error;
+the Bernoulli-reference z statistic is not a calibrated significance test.
