@@ -284,3 +284,13 @@ shot-type labels.
 
 We will document AI-assisted code and writing contributions
 according to course requirements.
+
+### Graph assumptions
+
+`python -m src.graph_assumptions` verifies selected d-separation claims for the
+hand BN, Naive Bayes, and current learned graph. The hand graph is defined once
+in `src/graphs.py`, shared by CPT prediction, full inference, and comparison.
+`graph_assumptions.csv` lists the restrictions each model imposes, including the
+joint outcome claim `M independent of {S,B} given {D,T,C,H}`. These are model
+assumptions, not evidence that observed shots satisfy independence or causality.
+The learned outcome claims use the verified graph's actual parent set.

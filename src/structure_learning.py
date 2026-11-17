@@ -10,29 +10,12 @@ from pgmpy.estimators import (
 )
 
 from src.evaluate import evaluate_model
+from src.graphs import FEATURES, VARIABLES, HAND_PARENTS, HAND_EDGES
 from src.validation import load_validation_data, write_validation_metadata
 
 
 DATA_DIR = Path("data/processed")
 RESULTS_DIR = Path("results/tables")
-
-FEATURES = ["T", "D", "C", "S", "B", "H"]
-VARIABLES = FEATURES + ["M"]
-
-HAND_PARENTS = ["D", "T", "C", "H"]
-
-HAND_EDGES = [
-    ("S", "B"),
-    ("B", "H"),
-    ("S", "H"),
-    ("D", "T"),
-    ("D", "C"),
-    ("B", "C"),
-    ("D", "M"),
-    ("T", "M"),
-    ("C", "M"),
-    ("H", "M"),
-]
 
 ALPHA = 1.0
 SCORING_METHOD = "bic-d"
