@@ -10,30 +10,16 @@ from pgmpy.estimators import (
 )
 
 from src.evaluate import evaluate_model
+from src.graphs import FEATURES, VARIABLES, HAND_PARENTS, HAND_EDGES
+from src.validation import load_validation_data, write_validation_metadata
 
 
 DATA_DIR = Path("data/processed")
 RESULTS_DIR = Path("results/tables")
 
-FEATURES = ["T", "D", "C", "S", "B", "H"]
-VARIABLES = FEATURES + ["M"]
-
-HAND_PARENTS = ["D", "T", "C", "H"]
-
-HAND_EDGES = [
-    ("S", "B"),
-    ("B", "H"),
-    ("S", "H"),
-    ("D", "T"),
-    ("D", "C"),
-    ("B", "C"),
-    ("D", "M"),
-    ("T", "M"),
-    ("C", "M"),
-    ("H", "M"),
-]
-
 ALPHA = 1.0
+SCORING_METHOD = "bic-d"
+MAX_INDEGREE = 4
 
 
 def prepare_data(df):
@@ -156,14 +142,14 @@ def learn_structure(train):
     print("\n=== LEARNING BN STRUCTURE ===")
     print("Method: Hill climbing")
     print("Score: BIC (discrete)")
-    print("Maximum parents per node: 4")
+    print("Maximum parents per node:", MAX_INDEGREE)
     print("Outgoing edges from M: forbidden")
 
     search = HillClimbSearch(train)
 
     dag = search.estimate(
-        scoring_method="bic-d",
-        max_indegree=4,
+        scoring_method=SCORING_METHOD,
+        max_indegree=MAX_INDEGREE,
         expert_knowledge=expert,
         show_progress=True,
     )
@@ -183,12 +169,7 @@ def learn_structure(train):
 def main():
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
-    train_raw = pd.read_csv(
-        DATA_DIR / "train_fit.csv"
-    )
-    val_raw = pd.read_csv(
-        DATA_DIR / "validation.csv"
-    )
+    train_raw, val_raw, cohort = load_validation_data(DATA_DIR)
 
     train = prepare_data(train_raw)
     val = prepare_data(val_raw)
@@ -258,6 +239,8 @@ def main():
 
         results.append({
             "model": name,
+            "training_shots": len(train),
+            "validation_shots": len(val),
             "parents": ",".join(parents),
             "unseen_fraction": unseen_fraction,
             **metrics,
@@ -274,6 +257,20 @@ def main():
     ).to_csv(
         RESULTS_DIR / "learned_edges.csv",
         index=False
+    )
+
+    write_validation_metadata(
+        RESULTS_DIR / "structure_validation_metadata.json",
+        "structure_validation",
+        cohort,
+        {
+            "alpha": ALPHA,
+            "scoring_method": SCORING_METHOD,
+            "max_indegree": MAX_INDEGREE,
+            "forbidden_edges": [["M", feature] for feature in FEATURES],
+            "make_parents": configurations,
+        },
+        [RESULTS_DIR / "structure_validation.csv", RESULTS_DIR / "learned_edges.csv"],
     )
 
     print("\nResults saved:")

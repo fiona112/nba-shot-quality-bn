@@ -1,4 +1,9 @@
+import hashlib
+import json
+
+import numpy as np
 import pandas as pd
+import pytest
 
 from src import preprocess as preprocessing
 from src.preprocess import parse_game_clock, preprocess, split_data, split_validation
@@ -101,7 +106,8 @@ def test_splits_keep_games_separate_and_cover_all_shots():
 def test_pipeline_logs_clock_exclusions_and_keeps_them_out_of_every_split(tmp_path, monkeypatch):
     # Each game has one observed clock, one unexplained missing clock, and one proxy.
     data = pd.DataFrame({
-        "SHOT_ID": range(150),
+        # A pre-existing shot ID is deliberately different from its row position.
+        "SHOT_ID": range(1000, 1150),
         "GAME_ID": [game for game in range(50) for _ in range(3)],
         "GAME_CLOCK": ["1:00", "1:00", "0:10"] * 50,
         "SHOT_CLOCK": [12.0, None, None] * 50,
@@ -121,16 +127,77 @@ def test_pipeline_logs_clock_exclusions_and_keeps_them_out_of_every_split(tmp_pa
     preprocessing.main()
 
     excluded = pd.read_csv(output_dir / "excluded_shot_clock.csv")
-    excluded_ids = set(data.loc[data.index % 3 == 1, "SHOT_ID"])
+    excluded_rows = set(range(1, 150, 3))
+    excluded_ids = set(data.iloc[sorted(excluded_rows)]["SHOT_ID"])
     assert set(excluded["SHOT_ID"]) == excluded_ids
     assert excluded["EXCLUDE_SHOT_CLOCK"].all()
     assert excluded["SHOT_CLOCK_EXCLUSION_REASON"].eq("missing_unexplained").all()
-    assert set(excluded["RAW_ROW_ID"]) == excluded_ids
+    assert set(excluded["RAW_ROW_ID"]) == excluded_rows
     for name in ["train", "train_fit", "validation", "test"]:
         frame = pd.read_csv(output_dir / f"{name}.csv")
         assert set(frame["SHOT_ID"]).isdisjoint(excluded_ids)
         assert not frame["EXCLUDE_SHOT_CLOCK"].any()
         assert frame["SHOT_CLOCK_EFFECTIVE"].notna().all()
+        assert frame["RAW_ROW_ID"].is_unique
+        assert frame["SHOT_ID"].eq(frame["RAW_ROW_ID"] + 1000).all()
+        assert set(frame["RAW_ROW_ID"]).isdisjoint(excluded_rows)
     train = pd.read_csv(output_dir / "train.csv")
     test = pd.read_csv(output_dir / "test.csv")
     assert set(train["SHOT_ID"]) | set(test["SHOT_ID"]) == set(data["SHOT_ID"]) - excluded_ids
+
+    validation = pd.read_csv(output_dir / "validation.csv")
+    train_fit = pd.read_csv(output_dir / "train_fit.csv")
+    partitions = [set(frame["RAW_ROW_ID"]) for frame in (train_fit, validation, test)]
+    assert partitions[0].isdisjoint(partitions[1])
+    assert partitions[0].isdisjoint(partitions[2])
+    assert partitions[1].isdisjoint(partitions[2])
+    assert set.union(*partitions) == set(range(150)) - excluded_rows
+
+    report_path = output_dir / "preprocessing_report.json"
+    report = json.loads(
+        report_path.read_text(),
+        parse_constant=lambda value: pytest.fail(f"Nonstandard JSON value: {value}"),
+    )
+    assert report["schema_version"] == 2
+    assert report["raw_input"]["sha256"] == hashlib.sha256(raw_path.read_bytes()).hexdigest()
+    assert report["raw_input"]["size_bytes"] == raw_path.stat().st_size
+    assert report["provenance"]["packages"]["numpy"] == np.__version__
+    assert report["provenance"]["packages"]["pandas"] == pd.__version__
+    assert "src/preprocess.py" in report["provenance"]["source_files_sha256"]
+    assert "src/provenance.py" in report["provenance"]["source_files_sha256"]
+    assert report["predictors"] == ["T", "D", "C", "S", "B", "H"]
+    assert report["discretization"]["D"]["edges"] == [0, 5, 10, 15, 20, 25, 30, "inf"]
+    assert report["discretization"]["S"]["source"] == "SHOT_CLOCK_EFFECTIVE"
+    assert report["discretization"]["S"]["closed"] == "left"
+    assert report["discretization"]["S"]["edges"][0] == "-inf"
+    assert report["split_config"] == {
+        "group": "GAME_ID",
+        "outer": {"test_fraction": 0.20, "seed": 42},
+        "validation": {"fraction_of_train": 0.20, "seed": 123},
+    }
+    for name, summary in report["splits"].items():
+        path = output_dir / summary["file"]
+        frame = pd.read_csv(path)
+        assert summary["sha256"] == hashlib.sha256(path.read_bytes()).hexdigest()
+        assert summary["shots"] == len(frame)
+        assert summary["games"] == frame["GAME_ID"].nunique()
+    assert report["excluded_shot_clock_sha256"] == hashlib.sha256(
+        (output_dir / "excluded_shot_clock.csv").read_bytes()
+    ).hexdigest()
+
+    # A rerun must reproduce data bytes and the report's deterministic fields.
+    preprocessing.main()
+    repeated_report = json.loads(report_path.read_text())
+    report.pop("created_at_utc")
+    repeated_report.pop("created_at_utc")
+    assert report == repeated_report
+
+
+def test_pipeline_rejects_a_preexisting_reserved_row_id(tmp_path, monkeypatch):
+    path = tmp_path / "raw.csv"
+    data = pd.DataFrame({column: [1] for column in preprocessing.REQUIRED})
+    data["RAW_ROW_ID"] = [123]
+    data.to_csv(path, index=False)
+    monkeypatch.setattr(preprocessing, "RAW_PATH", path)
+    with pytest.raises(ValueError, match="RAW_ROW_ID is reserved"):
+        preprocessing.main()

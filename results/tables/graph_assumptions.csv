@@ -1,0 +1,9 @@
+id,model,x,y,given,d_separated,interpretation
+hand_clock,Hand BN,M,S,"D,T,C,H",True,Graph-implied model restriction; not evidence of independence in NBA data.
+hand_dribbles,Hand BN,M,B,"D,T,C,H",True,Graph-implied model restriction; not evidence of independence in NBA data.
+hand_joint,Hand BN,M,"S,B","D,T,C,H",True,Graph-implied model restriction; not evidence of independence in NBA data.
+hand_roots,Hand BN,S,D,,True,Graph-implied model restriction; not evidence of independence in NBA data.
+nb_distance_type,Naive Bayes,D,T,M,True,Graph-implied model restriction; not evidence of independence in NBA data.
+nb_dribbles_touch,Naive Bayes,B,H,M,True,Graph-implied model restriction; not evidence of independence in NBA data.
+learned_touch,Learned BN,M,H,"C,D",True,Graph-implied model restriction; not evidence of independence in NBA data.
+learned_joint,Learned BN,M,"T,S,B,H","C,D",True,Graph-implied model restriction; not evidence of independence in NBA data.

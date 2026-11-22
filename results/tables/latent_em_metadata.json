@@ -1,0 +1,646 @@
+{
+  "schema_version": 1,
+  "experiment": "latent_em",
+  "created_at_utc": "2026-11-17T21:53:06.147949+00:00",
+  "inputs": {
+    "train": {
+      "file": "data/processed/train.csv",
+      "sha256": "ee1b1bed16f30fb6b5b7e666fc6e209cb0582a0dd0d370423ade07a0c11364d8",
+      "shots": 100396,
+      "games": 723
+    },
+    "test": {
+      "file": "data/processed/test.csv",
+      "sha256": "eb80a1f1f136f12257c3fe95ef5da4afba4537b3b32eeb2ba873f39bada2f57a",
+      "shots": 25355,
+      "games": 181
+    },
+    "train_fit": {
+      "file": "data/processed/train_fit.csv",
+      "sha256": "a6bba5a4efa744cd73538cd0ea8bbe24fba76ca26b0cd4f84c6d0b1deda354d9",
+      "shots": 80427,
+      "games": 578
+    },
+    "validation": {
+      "file": "data/processed/validation.csv",
+      "sha256": "723ad99d2206b69ecc7d034c7fb8d931037da443e4daa779014d30c67f1a11e2",
+      "shots": 19969,
+      "games": 145
+    }
+  },
+  "preprocessing_report_sha256": "4cc41f4809a31570148f8b2febb45cd791d856f9cc42e457139c10031024ffde",
+  "preprocessing_report_file": "data/processed/preprocessing_report.json",
+  "preprocessing": {
+    "schema_version": 2,
+    "created_at_utc": "2026-11-17T21:04:57.569545+00:00",
+    "raw_input": {
+      "file": "shot_logs.csv",
+      "size_bytes": 16423917,
+      "sha256": "e9c7fcd71e6f81ade108841449fe1bccda072ed98fae2b5dc86a3b9f29fe5c7c",
+      "row_id": "zero-based parsed data-row position, excluding header"
+    },
+    "provenance": {
+      "git": {
+        "commit": "b7143042282b6040f9dac10655153ecdd0baef4c",
+        "dirty": true
+      },
+      "python_version": "3.12.14",
+      "platform": "macOS-15.4.1-arm64-arm-64bit",
+      "packages": {
+        "Jinja2": "3.1.6",
+        "MarkupSafe": "3.0.4",
+        "PyYAML": "6.0.3",
+        "Pygments": "2.21.0",
+        "Send2Trash": "2.2.0",
+        "anyio": "4.16.0",
+        "appnope": "1.0.0",
+        "argon2-cffi": "25.1.0",
+        "argon2-cffi-bindings": "26.2.0",
+        "arrow": "1.4.0",
+        "asttokens": "3.0.2",
+        "async-lru": "2.4.0",
+        "attrs": "26.1.0",
+        "babel": "2.18.0",
+        "beautifulsoup4": "4.15.0",
+        "bleach": "6.4.0",
+        "certifi": "2026.10.23",
+        "cffi": "2.1.1",
+        "charset-normalizer": "3.5.2",
+        "click": "8.5.1",
+        "cloudpickle": "3.1.2",
+        "comm": "0.2.3",
+        "contourpy": "1.4.0",
+        "cycler": "0.12.1",
+        "debugpy": "1.8.22",
+        "defusedxml": "0.7.1",
+        "executing": "2.3.0",
+        "fastjsonschema": "2.22.3",
+        "filelock": "4.2.11",
+        "fonttools": "4.68.0",
+        "formulaic": "1.2.2",
+        "fqdn": "1.6.0",
+        "fsspec": "2026.9.0",
+        "h11": "0.16.0",
+        "hf-xet": "1.8.0",
+        "httpcore": "1.0.9",
+        "httpcore2": "2.16.2",
+        "httpx": "0.28.1",
+        "httpx2": "2.16.2",
+        "huggingface_hub": "2.4.0",
+        "idna": "3.20",
+        "iniconfig": "2.3.1",
+        "interface_meta": "2.0.1",
+        "ipykernel": "7.4.0",
+        "ipython": "9.18.1",
+        "ipython_pygments_lexers": "1.1.1",
+        "isoduration": "20.11.0",
+        "jedi": "0.20.1",
+        "joblib": "1.6.0",
+        "json5": "0.17.3",
+        "jsonpointer": "3.12",
+        "jsonschema": "4.26.0",
+        "jsonschema-specifications": "2025.9.1",
+        "jupyter-events": "0.12.1",
+        "jupyter-lsp": "2.3.1",
+        "jupyter_builder": "1.3.0",
+        "jupyter_client": "8.10.0",
+        "jupyter_core": "5.9.1",
+        "jupyter_server": "2.21.1",
+        "jupyter_server_terminals": "0.5.4",
+        "jupyterlab": "4.6.6",
+        "jupyterlab_pygments": "0.3.0",
+        "jupyterlab_server": "2.28.1",
+        "kiwisolver": "1.5.1",
+        "lark": "1.3.1",
+        "matplotlib": "3.11.2",
+        "matplotlib-inline": "0.2.2",
+        "mistune": "3.4.0",
+        "narwhals": "2.29.0",
+        "nbclient": "0.11.0",
+        "nbconvert": "7.17.2",
+        "nbformat": "5.11.1",
+        "nest-asyncio2": "1.7.4",
+        "networkx": "3.7",
+        "notebook_shim": "0.2.4",
+        "numpy": "2.5.5",
+        "opt_einsum": "3.4.0",
+        "packaging": "26.3",
+        "pandas": "2.3.3",
+        "pandocfilters": "1.5.1",
+        "parso": "0.8.7",
+        "patsy": "1.0.3",
+        "pexpect": "4.9.0",
+        "pgmpy": "1.1.2",
+        "pillow": "13.0.0",
+        "pip": "25.0.1",
+        "platformdirs": "4.14.7",
+        "pluggy": "1.7.0",
+        "prometheus_client": "0.26.0",
+        "prompt_toolkit": "3.0.53",
+        "psutil": "7.2.2",
+        "ptyprocess": "0.7.0",
+        "pure_eval": "0.2.4",
+        "pycparser": "3.12",
+        "pyparsing": "3.3.3",
+        "pytest": "9.2.0",
+        "python-dateutil": "4.0.0",
+        "python-json-logger": "4.2.0",
+        "pytz": "2026.6",
+        "pyzmq": "27.3.0",
+        "referencing": "0.37.0",
+        "requests": "2.34.2",
+        "rfc3339-validator": "0.1.4",
+        "rfc3986-validator": "0.1.1",
+        "rfc3987-syntax": "1.1.0",
+        "rpds-py": "2026.9.1",
+        "scikit-base": "1.2.1",
+        "scikit-learn": "1.9.1",
+        "scipy": "1.18.1",
+        "seaborn": "0.13.2",
+        "six": "1.17.0",
+        "soupsieve": "4.1.1",
+        "stack-data": "0.6.3",
+        "statsmodels": "0.15.0",
+        "terminado": "0.18.1",
+        "threadpoolctl": "3.8.0",
+        "tinycss2": "1.5.1",
+        "tornado": "6.6.1",
+        "tqdm": "4.70.1",
+        "traitlets": "5.16.1",
+        "truststore": "0.10.5",
+        "typing_extensions": "4.16.0",
+        "tzdata": "2026.6",
+        "uri-template": "1.3.0",
+        "urllib3": "2.8.0",
+        "wcwidth": "0.9.4",
+        "webcolors": "25.10.0",
+        "webencodings": "0.6.1",
+        "websocket-client": "1.9.2",
+        "wrapt": "2.5.2"
+      },
+      "source_files_sha256": {
+        "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "src/ablation.py": "241c4b6af5ec2c0b27bac5f31fd6cbc94e77fd70c31b27af63a2285092dc1adc",
+        "src/audit_shot_clock.py": "dae5c59c50c697527929a8eb315ac9c7dc43849bf38825e8b6946bea8a7353c3",
+        "src/baselines.py": "4fa54b095075778ed89cd36f4b9a5818510be13d76e3ec772a0fed1ae929be47",
+        "src/bayesian_network.py": "6cfca257b6dd5dc35711272935f39fb7f6574b033b45c130ddc6b09244a854dc",
+        "src/calibration.py": "0a306fb9eb02421fe9add45329b682f2d92161d0af456da2d8d2c11031b32b7e",
+        "src/chronological_evaluation.py": "5d1a15cdb1bc7ce36d3fc9a45fe27bddbd6e55b08d5c4a9bad1b3728ab5ad053",
+        "src/compare_distance_bins.py": "e66a340efcca214d6d2e6e70df727b6eb2459c9c6b49120d750c1e46a056b967",
+        "src/compare_preprocessing.py": "a8c5619595a8f96621343a9994179fb57df3385132080710e95fa20cba828b30",
+        "src/evaluate.py": "78d58bda19850200325c6a2d5ed9b4da69cad5299fad1b9766d66bb8a40be8d3",
+        "src/naive_bayes.py": "b38256ca93c72cdc446cad4d0370d37f93d7d98c53694fd211541934054dde22",
+        "src/preprocess.py": "0d8f0f2727ad03365f56b165cee954db330d100c9152847d8947d06778532008",
+        "src/provenance.py": "eeae1bcc53a53bbb75da629da6fd41c0a2bc78ee5899fbca92a91da2c5bbccba",
+        "src/structure_learning.py": "87750fb1a1bfef4c1ea28c76dcdc70e7ba4c3bf5eb108ade420665872b86a2bd",
+        "src/variable_elimination.py": "22209c5cba6d5f3f82ba682e13439fb10a18fbd45e8c04d81cab5028d053234a",
+        "requirements.txt": "5f40343873a07c6d375c5c2ddb1f259b661d7c3f64cf70141a120637c5149f05"
+      }
+    },
+    "predictors": [
+      "T",
+      "D",
+      "C",
+      "S",
+      "B",
+      "H"
+    ],
+    "discretization": {
+      "T": {
+        "source": "PTS_TYPE",
+        "states": [
+          "2",
+          "3"
+        ]
+      },
+      "D": {
+        "source": "SHOT_DIST",
+        "edges": [
+          0,
+          5,
+          10,
+          15,
+          20,
+          25,
+          30,
+          "inf"
+        ],
+        "labels": [
+          "<5",
+          "5-10",
+          "10-15",
+          "15-20",
+          "20-25",
+          "25-30",
+          "30+"
+        ],
+        "closed": "left"
+      },
+      "C": {
+        "source": "CLOSE_DEF_DIST",
+        "edges": [
+          "-inf",
+          2,
+          4,
+          6,
+          "inf"
+        ],
+        "labels": [
+          "0-2",
+          "2-4",
+          "4-6",
+          "6+"
+        ],
+        "closed": "left"
+      },
+      "S": {
+        "source": "SHOT_CLOCK_EFFECTIVE",
+        "edges": [
+          "-inf",
+          4,
+          7,
+          15,
+          18,
+          22,
+          "inf"
+        ],
+        "labels": [
+          "0-4",
+          "4-7",
+          "7-15",
+          "15-18",
+          "18-22",
+          "22+"
+        ],
+        "closed": "left"
+      },
+      "B": {
+        "source": "DRIBBLES",
+        "edges": [
+          "-inf",
+          1,
+          2,
+          3,
+          7,
+          "inf"
+        ],
+        "labels": [
+          "0",
+          "1",
+          "2",
+          "3-6",
+          "7+"
+        ],
+        "closed": "left"
+      },
+      "H": {
+        "source": "TOUCH_TIME",
+        "edges": [
+          "-inf",
+          2,
+          6,
+          "inf"
+        ],
+        "labels": [
+          "<2",
+          "2-6",
+          "6+"
+        ],
+        "closed": "left"
+      }
+    },
+    "split_config": {
+      "group": "GAME_ID",
+      "outer": {
+        "test_fraction": 0.2,
+        "seed": 42
+      },
+      "validation": {
+        "fraction_of_train": 0.2,
+        "seed": 123
+      }
+    },
+    "raw_rows": 128069,
+    "clean_rows": 125751,
+    "removed_rows_total": 2318,
+    "excluded_shot_clock_rows": 2013,
+    "excluded_shot_clock_file": "excluded_shot_clock.csv",
+    "excluded_shot_clock_sha256": "cd92dc9a49dc318aec8da7b0b8522b810019d38ff82a7e532f8870da784d5687",
+    "raw_shot_clock_sources": {
+      "recorded": 118645,
+      "recorded_24_unverified": 3857,
+      "period_clock_proxy": 3554,
+      "missing_unexplained": 2013
+    },
+    "retained_shot_clock_sources": {
+      "recorded": 118385,
+      "recorded_24_unverified": 3818,
+      "period_clock_proxy": 3548
+    },
+    "missing_clock_policy": "game_clock_proxy_if_0_to_24_seconds_else_drop",
+    "recorded_24_policy": "keep_and_flag_unverified",
+    "splits": {
+      "train": {
+        "shots": 100396,
+        "games": 723,
+        "file": "train.csv",
+        "sha256": "ee1b1bed16f30fb6b5b7e666fc6e209cb0582a0dd0d370423ade07a0c11364d8"
+      },
+      "test": {
+        "shots": 25355,
+        "games": 181,
+        "file": "test.csv",
+        "sha256": "eb80a1f1f136f12257c3fe95ef5da4afba4537b3b32eeb2ba873f39bada2f57a"
+      },
+      "train_fit": {
+        "shots": 80427,
+        "games": 578,
+        "file": "train_fit.csv",
+        "sha256": "a6bba5a4efa744cd73538cd0ea8bbe24fba76ca26b0cd4f84c6d0b1deda354d9"
+      },
+      "validation": {
+        "shots": 19969,
+        "games": 145,
+        "file": "validation.csv",
+        "sha256": "723ad99d2206b69ecc7d034c7fb8d931037da443e4daa779014d30c67f1a11e2"
+      }
+    }
+  },
+  "cohorts": {
+    "train_fit": {
+      "shots": 80427,
+      "games": 578,
+      "make_rate": 0.45196264935904606
+    },
+    "validation": {
+      "shots": 19969,
+      "games": 145,
+      "make_rate": 0.4491962541940007
+    },
+    "train": {
+      "shots": 100396,
+      "games": 723,
+      "make_rate": 0.4514124068687996
+    },
+    "test": {
+      "shots": 25355,
+      "games": 181,
+      "make_rate": 0.4574245710905147
+    }
+  },
+  "configuration": {
+    "method_attribution": "Anna He; original team PR #4, commit c816b57f76e4f8a91460e8d1ae9ced1d6ba13530",
+    "graph": "Q -> T,D,C,S,B,H,M; observed nodes independent given Q",
+    "k_values": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      12,
+      14,
+      16,
+      18,
+      20
+    ],
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "alpha_pseudocount": 1.0,
+    "dirichlet_concentration": 2.0,
+    "max_iter": 1000,
+    "tol_per_shot": 1e-07,
+    "stopping": "MAP objective improvement < tol * training_shots; material decrease raises an error; cap is recorded",
+    "restart_selection": "highest training MAP objective for each K; no validation-based restart choice",
+    "k_selection": "lowest validation log loss; ties use first K in fixed ascending grid",
+    "selected_k": 18,
+    "refit": "same fixed seeds and settings on complete outer training, then evaluate unchanged original test rows",
+    "prediction": "marginalize Q conditional on features only; unseen features summed out; target never used",
+    "compression": "frequency-weighted distinct observed tuples; seeded initialization remains per-shot",
+    "numerical_environment": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    },
+    "bic": "descriptive formula evaluated at MAP fit, not used for selection; finite mixtures need not satisfy regular BIC assumptions",
+    "calibration_bins": 10,
+    "calibration_binning": "same equal-width bins as common final evaluation",
+    "interval": "1000 paired game-cluster percentile replicates, seed 20261117; positive hand loss minus latent loss favors latent",
+    "limitations": "Original test was inspected in earlier work. Selected K is exploratory validation selection; intervals condition on fixed fits and omit selection/refit uncertainty and player dependence across games. Q labels are statistical shot configurations, not identified causal difficulty or shooter skill."
+  },
+  "provenance": {
+    "git": {
+      "commit": "4bc63a6b40d6da8368a4ae24a0bd78ba8fc44ba7",
+      "dirty": true
+    },
+    "python_version": "3.12.14",
+    "platform": "macOS-15.4.1-arm64-arm-64bit",
+    "python_hash_seed": "0",
+    "packages": {
+      "Jinja2": "3.1.6",
+      "MarkupSafe": "3.0.4",
+      "PyYAML": "6.0.3",
+      "Pygments": "2.21.0",
+      "Send2Trash": "2.2.0",
+      "anyio": "4.16.0",
+      "appnope": "1.0.0",
+      "argon2-cffi": "25.1.0",
+      "argon2-cffi-bindings": "26.2.0",
+      "arrow": "1.4.0",
+      "asttokens": "3.0.2",
+      "async-lru": "2.4.0",
+      "attrs": "26.1.0",
+      "babel": "2.18.0",
+      "beautifulsoup4": "4.15.0",
+      "bleach": "6.4.0",
+      "certifi": "2026.10.23",
+      "cffi": "2.1.1",
+      "charset-normalizer": "3.5.2",
+      "click": "8.5.1",
+      "cloudpickle": "3.1.2",
+      "comm": "0.2.3",
+      "contourpy": "1.4.0",
+      "cycler": "0.12.1",
+      "debugpy": "1.8.22",
+      "defusedxml": "0.7.1",
+      "executing": "2.3.0",
+      "fastjsonschema": "2.22.3",
+      "filelock": "4.2.11",
+      "fonttools": "4.68.0",
+      "formulaic": "1.2.2",
+      "fqdn": "1.6.0",
+      "fsspec": "2026.9.0",
+      "h11": "0.16.0",
+      "hf-xet": "1.8.0",
+      "httpcore": "1.0.9",
+      "httpcore2": "2.16.2",
+      "httpx": "0.28.1",
+      "httpx2": "2.16.2",
+      "huggingface_hub": "2.4.0",
+      "idna": "3.20",
+      "iniconfig": "2.3.1",
+      "interface_meta": "2.0.1",
+      "ipykernel": "7.4.0",
+      "ipython": "9.18.1",
+      "ipython_pygments_lexers": "1.1.1",
+      "isoduration": "20.11.0",
+      "jedi": "0.20.1",
+      "joblib": "1.6.0",
+      "json5": "0.17.3",
+      "jsonpointer": "3.12",
+      "jsonschema": "4.26.0",
+      "jsonschema-specifications": "2025.9.1",
+      "jupyter-events": "0.12.1",
+      "jupyter-lsp": "2.3.1",
+      "jupyter_builder": "1.3.0",
+      "jupyter_client": "8.10.0",
+      "jupyter_core": "5.9.1",
+      "jupyter_server": "2.21.1",
+      "jupyter_server_terminals": "0.5.4",
+      "jupyterlab": "4.6.6",
+      "jupyterlab_pygments": "0.3.0",
+      "jupyterlab_server": "2.28.1",
+      "kiwisolver": "1.5.1",
+      "lark": "1.3.1",
+      "matplotlib": "3.11.2",
+      "matplotlib-inline": "0.2.2",
+      "mistune": "3.4.0",
+      "narwhals": "2.29.0",
+      "nbclient": "0.11.0",
+      "nbconvert": "7.17.2",
+      "nbformat": "5.11.1",
+      "nest-asyncio2": "1.7.4",
+      "networkx": "3.7",
+      "notebook_shim": "0.2.4",
+      "numpy": "2.5.5",
+      "opt_einsum": "3.4.0",
+      "packaging": "26.3",
+      "pandas": "2.3.3",
+      "pandocfilters": "1.5.1",
+      "parso": "0.8.7",
+      "patsy": "1.0.3",
+      "pexpect": "4.9.0",
+      "pgmpy": "1.1.2",
+      "pillow": "13.0.0",
+      "pip": "25.0.1",
+      "platformdirs": "4.14.7",
+      "pluggy": "1.7.0",
+      "prometheus_client": "0.26.0",
+      "prompt_toolkit": "3.0.53",
+      "psutil": "7.2.2",
+      "ptyprocess": "0.7.0",
+      "pure_eval": "0.2.4",
+      "pycparser": "3.12",
+      "pyparsing": "3.3.3",
+      "pytest": "9.2.0",
+      "python-dateutil": "4.0.0",
+      "python-json-logger": "4.2.0",
+      "pytz": "2026.6",
+      "pyzmq": "27.3.0",
+      "referencing": "0.37.0",
+      "requests": "2.34.2",
+      "rfc3339-validator": "0.1.4",
+      "rfc3986-validator": "0.1.1",
+      "rfc3987-syntax": "1.1.0",
+      "rpds-py": "2026.9.1",
+      "scikit-base": "1.2.1",
+      "scikit-learn": "1.9.1",
+      "scipy": "1.18.1",
+      "seaborn": "0.13.2",
+      "six": "1.17.0",
+      "soupsieve": "4.1.1",
+      "stack-data": "0.6.3",
+      "statsmodels": "0.15.0",
+      "terminado": "0.18.1",
+      "threadpoolctl": "3.8.0",
+      "tinycss2": "1.5.1",
+      "tornado": "6.6.1",
+      "tqdm": "4.70.1",
+      "traitlets": "5.16.1",
+      "truststore": "0.10.5",
+      "typing_extensions": "4.16.0",
+      "tzdata": "2026.6",
+      "uri-template": "1.3.0",
+      "urllib3": "2.8.0",
+      "wcwidth": "0.9.4",
+      "webcolors": "25.10.0",
+      "webencodings": "0.6.1",
+      "websocket-client": "1.9.2",
+      "wrapt": "2.5.2"
+    },
+    "source_files_sha256": {
+      "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "src/ablation.py": "48ba2b610394ba0652ccd37151e96c02d41db5007c489974d7f92b01d8ee7468",
+      "src/audit_shot_clock.py": "dae5c59c50c697527929a8eb315ac9c7dc43849bf38825e8b6946bea8a7353c3",
+      "src/baselines.py": "4fa54b095075778ed89cd36f4b9a5818510be13d76e3ec772a0fed1ae929be47",
+      "src/bayesian_network.py": "b7319e368f214b0611ed8e49f76ffa7fa1c3ba2e8067f8026556b832406cc92c",
+      "src/calibration.py": "59ea81ffcdb8f458a2bb26db0d032cd58f0b27f4f1b9e6df53b872361f98a338",
+      "src/chronological_evaluation.py": "4ce6e28e3eb5209378f339ac08817463b24b38c876a122742b2119a8bf66919a",
+      "src/ci_sensitivity.py": "03dd1a4ab1c54d70bb512324f0eabb87b6b8ccd8b167b7b0bfd0ae074c13f3c3",
+      "src/compare_distance_bins.py": "e66a340efcca214d6d2e6e70df727b6eb2459c9c6b49120d750c1e46a056b967",
+      "src/compare_preprocessing.py": "a8c5619595a8f96621343a9994179fb57df3385132080710e95fa20cba828b30",
+      "src/conditional_independence.py": "03cf4f09b05736a08d77c173dc42f24057b16b48d085c4c5bf08a3d051253ae2",
+      "src/evaluate.py": "78d58bda19850200325c6a2d5ed9b4da69cad5299fad1b9766d66bb8a40be8d3",
+      "src/final_evaluation.py": "ceea361b2fefb2fa9af71f3a686b12a605369eab6a99b95e942b895f89bc97e5",
+      "src/graph_assumptions.py": "c3afd9774eb95fa29fe66658646d27c1b826bc8a83e579c76ab99668cd3ba093",
+      "src/graphs.py": "46eddba0e94442d2623951b4bd4ef20a5ddd8071532e55fbb2eefdbbd4788854",
+      "src/interpretation.py": "41088fd5c545a6b1bf0c7373adc4967a59c4ca35a6da4ef727620854acd34f0b",
+      "src/latent_em.py": "73ff4e256e768ec3e2e2e76b5a704a9600037d1ee9d665d6272eea836e2f3a46",
+      "src/naive_bayes.py": "b38256ca93c72cdc446cad4d0370d37f93d7d98c53694fd211541934054dde22",
+      "src/player_comparison.py": "3966c184da8e0dea2398953e425c50a7efa80f4c8a7660b53f8b74ae50fdd371",
+      "src/preprocess.py": "0d8f0f2727ad03365f56b165cee954db330d100c9152847d8947d06778532008",
+      "src/provenance.py": "07757f40a6c301a1d1e5352d3149723321d8ce3e3ddc0264090757b8274e7612",
+      "src/structure_learning.py": "6d786abceb3cd1922ba66bca471601ea48ef1d2559a0e33f919bb3d90192df15",
+      "src/validation.py": "9dc77b70344f3146c44d639158e266fcb5c2309e971bf16f1412fa1d7591066b",
+      "src/variable_elimination.py": "1769fbdd501cdb880f41b76be1057162c5194f5d51fda0498ef47bcbadb19847",
+      "requirements.txt": "913406cd3d2a11edb764b54ffeb81bde1fbd91207bfb71186a2a0dd4df73b238"
+    }
+  },
+  "dependencies": {},
+  "outputs": {
+    "latent_em_validation.csv": {
+      "file": "results/tables/latent_em_validation.csv",
+      "sha256": "e873c0e7f58c965fd7918e51b2dcf8649f1aa980244df6684263826a2a0ed0c3"
+    },
+    "latent_em_test_metrics.csv": {
+      "file": "results/tables/latent_em_test_metrics.csv",
+      "sha256": "b6318a70c0370a3db17dd11cbf17382fecef2d2e37840cb0cd46e8c842540abd"
+    },
+    "latent_em_states.csv": {
+      "file": "results/tables/latent_em_states.csv",
+      "sha256": "456a894ef155dd192f7f2dec0ea298819f576e643c12eac1216a54359e6c8523"
+    },
+    "latent_em_calibration_bins.csv": {
+      "file": "results/tables/latent_em_calibration_bins.csv",
+      "sha256": "d24695ebf793cdcafb72be8267ce04a3f62c41b3adbdebf55a780e5fccb4bd4b"
+    },
+    "latent_em_restarts.csv": {
+      "file": "results/tables/latent_em_restarts.csv",
+      "sha256": "9dc6b7ddedf883462d4e0434bbe312b59e330d82409cf8491c57aea974c9dba0"
+    },
+    "latent_em_paired_comparison.csv": {
+      "file": "results/tables/latent_em_paired_comparison.csv",
+      "sha256": "53a0825d7318bed448d0c8db7fd0ccd84f5589b0d7e57587b1f290397ffc0973"
+    },
+    "latent_em_trace.csv": {
+      "file": "data/processed/latent_em_trace.csv",
+      "sha256": "1bba2dca1e1c517b34bd00959781dac1943555df572807ee140f1952ce4e0193"
+    },
+    "latent_em_test_predictions.csv": {
+      "file": "data/processed/latent_em_test_predictions.csv",
+      "sha256": "8578a5344bb096f03a818bb820eb1b70ab2ae506699378b72fe40301586e0db9"
+    },
+    "latent_em.png": {
+      "file": "results/figures/latent_em.png",
+      "sha256": "66acee956990e5a8d79373708cb9120ef09f2d050d9f3492f6a4ec3d5a01116a"
+    }
+  }
+}
